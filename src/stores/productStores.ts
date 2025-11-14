@@ -84,7 +84,7 @@ export const useProductStore = create<ProductState & ProductActions>()(
         findMatchingVariant: () => {
           const { product, selectedVariations } = get();
           if (!product) return null;
-          const neededKeys = product.variations.map((v) => v.name);
+          const neededKeys = product?.variations?.map((v) => v.name);
          
           const isComplete = neededKeys.every((k) => !!selectedVariations[k]);
           if (!isComplete) return null;
