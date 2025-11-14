@@ -126,37 +126,7 @@ Includes image gallery with zoom, variation selection, and a persistent cart dra
 - Add to cart + Checkout
 
 ---
-
-## 🔤 Fonts Setup (`index.css`)
-
-```css
-@import url('https://api.fontshare.com/v2/css?f[]=clash-grotesk@400,700&display=swap');
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-body {
-  font-family: "Clash Grotesk", system-ui, sans-serif;
-}
-
-@layer components {
-  .container {
-    @apply max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8;
-  }
-}
-
-.zoom-box > * {
-  height: 100%;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-```
-
  
----
 
 ## 🧪 Testing Guidelines
 
