@@ -145,6 +145,12 @@ Includes image gallery with zoom, variation selection, and a persistent cart dra
 - Drawer subtotal updates
 
 ---
+### 🔧 Environment Variables
+
+Create a `.env` file in the project root  and add:
+
+```env
+REACT_APP_API_BASE_URL=https://api.easy-orders.net/api/v1
 
 ## 🚀 Getting Started
 
