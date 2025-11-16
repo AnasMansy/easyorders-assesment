@@ -20,25 +20,31 @@ export default function ProductDetail() {
 
   const openCart = useCartStore((s) => s.open);
   const addItem = useCartStore((s) => s.addItem);
-
-  useEffect(() => {
+useEffect(() => {
     fetchProduct("Sneakers12");
- 
   }, []);
+
+  // Names we require (present only if the product actually has them)
+  const requiredVariationNames =
+    product?.variations?.filter(v => v.name === "color" || v.name === "size")
+                         .map(v => v.name) ?? [];
+
+  const isSelectionComplete = requiredVariationNames.every(
+    (name) => !!selectedVariations[name]
+  );
 
   const onAddToCart = () => {
     if (!product) return;
 
-    if (product.variations?.length) {
-      const allChosen = product.variations.every((v) => selectedVariations[v.name]);
-      if (!allChosen) {
-        alert("Please choose all variations (e.g., color and size).");
-        return;
-      }
+    // Block if selections are incomplete
+    if (!isSelectionComplete) {
+      // you can replace with toast/snackbar if you have one
+      // e.g., toast.warn("Please select color and size");
+      return;
     }
 
     const currentVariant = findMatchingVariant();
-    addItem(product, currentVariant, 1);  
+    addItem(product, currentVariant, 1);
     openCart();
   };
 
@@ -51,23 +57,22 @@ export default function ProductDetail() {
   const available = isVariantAvailable();
 
   return (
-    <div className="container mx-auto px-4 py-8 grid md:grid-cols-2 gap-10">
- 
-
-
+    <div className="container mx-auto px-4 pt-8 grid md:grid-cols-2 gap-10">
       <ProductImage thumb={product.thumb} images={product.images} />
 
-    
       <ProductInfo
         product={product}
         variations={product.variations || []}
         selectedVariations={selectedVariations}
         setSelectedVariation={setSelectedVariation}
-        price={price}
-        salePrice={salePrice}
-        available={available}
+        price={getCurrentPrice()}
+        salePrice={getCurrentSalePrice()}
+        available={isVariantAvailable()}
         onAddToCart={onAddToCart}
         openCart={openCart}
+        // NEW: pass whether user can add now
+        canAddToCart={isSelectionComplete}
+        requiredVariationNames={requiredVariationNames}
       />
     </div>
   );

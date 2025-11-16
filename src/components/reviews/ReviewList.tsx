@@ -2,15 +2,13 @@ import { useMemo, useState } from "react";
 import StarRating from "../rating/StarRating";
 import like from "../../assets/img/like.png";
 import dislike from "../../assets/img/dislike.png";
-
+import filterIcon from "../../assets/img/filter.png";
 import avatar1 from "../../assets/img/Ellipse 14.png";
 import avatar2 from "../../assets/img/Ellipse 141.png";
 import avatar3 from "../../assets/img/Ellipse 142.png";
 import avatar4 from "../../assets/img/Frame 193.png";
 
-type ReviewsSectionProps = {
-  tabs?: string[];
-};
+
 
 const DEFAULT_TABS = ["All Reviews", "Photos & Videos", "With Description"];
 const REVIEWS_PER_PAGE = 3;
@@ -67,8 +65,13 @@ const MOCK_REVIEWS = [
     hasMedia: false,
     hasText: true,
   },
-]; 
-export default function ReviewList({ tabs = DEFAULT_TABS }: ReviewsSectionProps) {
+];
+type ReviewsSectionProps = {
+  tabs?: string[];
+  onOpenFilters?: () => void; // NEW
+};
+
+export default function ReviewList({ tabs = DEFAULT_TABS, onOpenFilters }: ReviewsSectionProps) {
   const [selectedTab, setSelectedTab] = useState(tabs[0]);
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -93,30 +96,62 @@ export default function ReviewList({ tabs = DEFAULT_TABS }: ReviewsSectionProps)
 
   return (
     <section className="mt-6">
-      {/* Title */}
-      <h2 className="text-[1rem] md:text-[1.25rem] font-semibold text-darkText mb-4">
-        Review Lists
-      </h2>
+      {/* Header with mobile filter button */}
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-[1rem] md:text-[1.25rem] font-semibold text-darkText">
+          Review Lists
+        </h2>
 
-      {/* Tabs (inline, same design) */}
-      <div className="flex gap-3">
-        {tabs.map((tab) => {
-          const isSelected = selectedTab === tab;
-          return (
-            <button
-              key={tab}
-              onClick={() => handleTab(tab)}
-              className={`pb-2 text-[0.75rem] md:text-sm font-medium transition-colors duration-200 border-[1px] px-[10px] md:px-[20px] py-[10px] rounded-md ${
-                isSelected
-                  ? "text-dark border-dark bg-[#EBEBEB]"
-                  : "text-darkPrice border-[#E6E6E6] hover:text-grayLink"
-              }`}
-            >
-              {tab}
-            </button>
-          );
-        })}
+
       </div>
+
+      {/* Tabs */}
+      <div className="flex items-center justify-between gap-3 items-start">
+     
+        <div
+          role="tablist"
+          className="grid grid-flow-col auto-cols-max grid-rows-2 gap-2"
+        >
+          {tabs.map((tab) => {
+            const isSelected = selectedTab === tab;
+            return (
+              <button
+                key={tab}
+                role="tab"
+                aria-selected={isSelected}
+                onClick={() => {
+                  setSelectedTab(tab);
+                  setCurrentPage(1);
+                }}
+                className={`w-auto text-[0.75rem] md:text-sm font-medium transition-colors duration-200
+                      border px-[10px] md:px-[20px] py-[10px] rounded-md
+                      ${isSelected
+                    ? "text-dark border-dark bg-[#EBEBEB]"
+                    : "text-darkPrice border-[#E6E6E6] hover:text-grayLink"}`}
+              >
+                {tab}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Filter icon on the right  */}
+        {onOpenFilters && (
+          <button
+            type="button"
+            onClick={onOpenFilters}
+            className="md:hidden border border-[#E6E6E6] rounded-md p-2 hover:bg-gray-50 transition-shadows"
+            aria-label="Open filters"
+          >
+            <img
+              src={filterIcon}
+              alt="Filters"
+              className="w-5 h-5 md:w-6 md:h-6 object-contain"
+            />
+          </button>
+        )}
+      </div>
+
 
       {/* Reviews List (same Feedback design) */}
       <div className="md:m-8">
@@ -170,11 +205,10 @@ export default function ReviewList({ tabs = DEFAULT_TABS }: ReviewsSectionProps)
                 <button
                   key={pageNumber}
                   onClick={() => handlePageClick(pageNumber)}
-                  className={`w-10 h-10 rounded-lg border text-sm font-medium ${
-                    isActive
-                      ? "text-darkPrice border-darkPrice"
-                      : "text-gray-600 border-[#E4E9EE] hover:bg-gray-100"
-                  }`}
+                  className={`w-10 h-10 rounded-lg border text-sm font-medium ${isActive
+                    ? "text-darkPrice border-darkPrice"
+                    : "text-gray-600 border-[#E4E9EE] hover:bg-gray-100"
+                    }`}
                 >
                   {pageNumber}
                 </button>

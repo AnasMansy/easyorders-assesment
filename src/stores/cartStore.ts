@@ -36,7 +36,7 @@ type CartActions = {
 
 const variantLabel = (variant: ProductVariant | null) =>
   variant
-    ? variant.variation_props.map((vp) => `${vp.variation}: ${vp.variation_prop}`).join(" / ")
+    ? variant?.variation_props?.map((vp) => `${vp.variation}: ${vp.variation_prop}`).join(" / ")
     : undefined;
 
 const variantKey = (product: Product, variant: ProductVariant | null) =>

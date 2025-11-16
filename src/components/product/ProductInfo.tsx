@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import star from "../../assets/img/star.png";
 import type { Variation, Product } from "../../types/product";
+import ColorSelector from "../utilits/ColorSelector";
+import SizeSelector from "../utilits/SizeSelector";
 
 type ProductInfoProps = {
   product: Product;
@@ -14,6 +16,8 @@ type ProductInfoProps = {
 
   onAddToCart: () => void;
   openCart: () => void;
+  canAddToCart?: boolean;
+  requiredVariationNames?: string[];
 };
 
 export default function ProductInfo({
@@ -26,79 +30,60 @@ export default function ProductInfo({
   available,
   onAddToCart,
   openCart,
+  canAddToCart = false,
+  requiredVariationNames = [],
 }: ProductInfoProps) {
   const hasSale = salePrice > 0 && salePrice < price;
   const [expanded, setExpanded] = useState(false);
+  const [showStockHint, setShowStockHint] = useState(false);
+  const [showValidationHint, setShowValidationHint] = useState(false);
 
-  // Pick category label (explicitly show "Mules" if present / fallback)
+  // Pick category label
   const categoryLabel = product.categories?.[0]?.name ?? "Mules";
 
-  // Find specific variations by name (no map rendering)
+  // Find specific variations by name
   const colorVar = variations.find((v) => v.name === "color");
   const sizeVar = variations.find((v) => v.name === "size");
 
-  // Helper to render one color button (no map)
-  const ColorBtn = (idx: number) => {
-    const p = colorVar?.props?.[idx];
-    if (!p) return null;
-    const selected = selectedVariations[colorVar!.name] === p.name;
-    return (
-      <button
-        key={p.id}
-        onClick={() => setSelectedVariation(colorVar!.name, p.name)}
-        className={`rounded-xl border px-3 py-2 text-sm transition ${
-          selected ? "border-black" : "border-gray-200 hover:border-gray-400"
-        }`}
-        aria-pressed={selected}
-        title={`color: ${p.name}`}
-      >
-        <div className="flex items-center gap-1">
-          {p.value ? (
-            <img
-              src={p.value}
-              alt={p.name}
-              className="h-6 w-6 rounded-full object-cover border"
-            />
-          ) : (
-            <span className="inline-block h-6 w-6 rounded-full bg-gray-200" />
-          )}
-          <span className="capitalize">{p.name}</span>
-        </div>
-      </button>
-    );
+  const selectedColor = colorVar ? selectedVariations[colorVar.name] ?? null : null;
+  const selectedSize = sizeVar ? selectedVariations[sizeVar.name] ?? null : null;
+
+  // Missing variation names for message
+  const missing = requiredVariationNames.filter((n) => !selectedVariations[n]);
+
+  // Hide validation hint once selections are complete
+  useEffect(() => {
+    if (canAddToCart) {
+      setShowValidationHint(false);
+    }
+  }, [canAddToCart]);
+
+  const handleAddClick = () => {
+    if (!canAddToCart) {
+      setShowValidationHint(true);
+      return;
+    }
+    onAddToCart();
+    setShowStockHint(true);
   };
 
-  // Helper to render one size button (no map)
-  const SizeBtn = (idx: number) => {
-    const p = sizeVar?.props?.[idx];
-    if (!p) return null;
-    const selected = selectedVariations[sizeVar!.name] === p.name;
-    return (
-      <button
-        key={p.id}
-        onClick={() => setSelectedVariation(sizeVar!.name, p.name)}
-        className={`rounded-xl border px-3 py-2 text-sm transition ${
-          selected ? "border-black" : "border-gray-200 hover:border-gray-400"
-        }`}
-        aria-pressed={selected}
-        title={`size: ${p.name}`}
-      >
-        <span className="capitalize">{p.name}</span>
-      </button>
-    );
-  };
+  useEffect(() => {
+    const handleToggle = () => setExpanded((v) => !v);
+    window.addEventListener("toggle-description", handleToggle);
+    return () => window.removeEventListener("toggle-description", handleToggle);
+  }, []);
 
   return (
     <div className="flex-1 mt-14 md:mt-0">
       <div className="flex flex-col gap-2">
         <div className="flex flex-col gap-7">
-          {/* Category  */}
+          {/* Category */}
           <div>
-            <p className="text-graysecondary text-[13px] md:text-base font-medium text-nowrap mb-3">
-              {categoryLabel }
+            <p className="text-graysecondary text-[13px] md:text-base font-medium text-nowrap">
+              {categoryLabel}
             </p>
             <h1 className="font-semibold text-[23px] md:text-[36px] text-darkText leading-[120%] tracking-[-0.5%]">
-              {product.name  }
+              {product.name}
             </h1>
           </div>
 
@@ -107,28 +92,27 @@ export default function ProductInfo({
             <div className="flex items-center gap-4">
               {hasSale ? (
                 <>
-                
                   <p className="text-grayPrice line-through font-medium text-sm md:text-[18px] leading-[120%]">
-                    {new Intl.NumberFormat("en-EG", {
+                    {new Intl.NumberFormat("en-GB", {
                       style: "currency",
-                      currency: "EGP",
+                      currency: "GBP",
                       maximumFractionDigits: 0,
                     }).format(price)}
                   </p>
-                   
+
                   <p className="text-darkPrice font-semibold text-[1.25rem] md:text-[28px] leading-[120%]">
-                    {new Intl.NumberFormat("en-EG", {
+                    {new Intl.NumberFormat("en-GB", {
                       style: "currency",
-                      currency: "EGP",
+                      currency: "GBP",
                       maximumFractionDigits: 0,
                     }).format(salePrice)}
                   </p>
                 </>
               ) : (
                 <p className="text-darkPrice font-semibold text-[1.25rem] md:text-[28px] leading-[120%]">
-                  {new Intl.NumberFormat("en-EG", {
+                  {new Intl.NumberFormat("en-GB", {
                     style: "currency",
-                    currency: "EGP",
+                    currency: "GBP",
                     maximumFractionDigits: 0,
                   }).format(price)}
                 </p>
@@ -149,22 +133,20 @@ export default function ProductInfo({
             </div>
           </div>
 
-           
           <div className="container">
             <hr className="m-0 border-t-[0.5px] border-dashed border-[#A3A3A3]" />
           </div>
         </div>
 
-        {/* Description  */}
+        {/* Description */}
         <div>
           <h2 className="mb-[10px] font-bold text-[1.125rem] md:text-[1.25rem]">
             Description:
           </h2>
-
           <div className="prose prose-sm max-w-none">
             <div className="relative">
               <div
-                className={!expanded ? "overflow-hidden" : ""}
+                className={!expanded ? "overflow-hidden md:pr-20" : "pr-0"}
                 style={
                   !expanded
                     ? {
@@ -175,106 +157,144 @@ export default function ProductInfo({
                       }
                     : undefined
                 }
-                 
-                dangerouslySetInnerHTML={{ __html: product.description }}
-              />
+              >
+                <span
+                  className="font-normal text-[16px] leading-[130%] tracking-[0]"
+                  dangerouslySetInnerHTML={{ __html: product.description }}
+                />
+                {expanded && (
+                  <button
+                    type="button"
+                    onClick={() => setExpanded((v) => !v)}
+                    className="font-normal text-[16px] leading-[130%] tracking-[0] inline ml-2 underline text-gray-800 hover:text-black align-bottom"
+                  >
+                    See less
+                  </button>
+                )}
+              </div>
+
               {!expanded && (
-                <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-white to-transparent" />
+                <>
+                  <div className="pointer-events-none md:absolute bottom-0 right-0 h-[1.35em] w-28 bg-gradient-to-l from-white to-transparent" />
+                  <button
+                    type="button"
+                    onClick={() => setExpanded(true)}
+                    className="font-normal text-[16px] leading-[130%] tracking-[0] absolute bottom-0 right-0 underline text-gray-800 hover:text-black px-1"
+                    style={{ verticalAlign: "bottom" }}
+                  >
+                    … See more
+                  </button>
+                </>
               )}
             </div>
-
-            <button
-              type="button"
-              onClick={() => setExpanded((v) => !v)}
-              className="mt-2 text-sm font-medium underline text-gray-700 hover:text-black"
-            >
-              {expanded ? "See less" : "See more"}
-            </button>
           </div>
         </div>
 
-        {/* Variations  */}
-        {/* color */}
+        {/* Variations */}
         {colorVar && (
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-clash font-semibold text-graysecondary text-sm leading-[120%] ">
-                {colorVar.name /* "color" */}
-              </h3>
-            </div>
+          <div className="flex flex-col gap-3">
+            <h3 className="font-medium text-[1.125rem] md:text-[1.25rem] text-graysecondary">
+              {colorVar.name}:{" "}
+              <span className="text-[#292929] font-semibold">
+                {selectedColor ?? "None"}
+              </span>
+            </h3>
 
-            <div className="flex flex-wrap gap-2">
-              {ColorBtn(0)}
-              {ColorBtn(1)}
-              {ColorBtn(2)}
-              {/* add more manually if needed */}
-            </div>
+            <ColorSelector
+              variation={colorVar}
+              selected={selectedColor}
+              onSelect={(val) => setSelectedVariation(colorVar.name, val)}
+              limit={3}
+            />
           </div>
         )}
 
-        {/* size + view size chart */}
         {sizeVar && (
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-clash font-semibold  text-graysecondary text-sm leading-[120%] capitalize">
-                {sizeVar.name  }
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <h3 className="font-medium text-[1.125rem] md:text-[1.25rem] text-graysecondary">
+                {sizeVar.name}:{" "}
+                <span className="text-[#292929] font-semibold">
+                  {selectedSize ?? "None"}
+                </span>
               </h3>
+
               <button
                 type="button"
-                className="font-clash font-medium  text-graysecondary text-sm leading-[120%] underline-offset-4 hover:underline"
+                className="font-clash font-medium text-graysecondary text-sm leading-[120%] underline-offset-4 hover:underline"
               >
                 View Size Chart
               </button>
             </div>
 
-            <div className="flex flex-wrap gap-2">
-              {SizeBtn(0)}
-              {SizeBtn(1)}
-              {SizeBtn(2)}
-            </div>
+            <SizeSelector
+              variation={sizeVar}
+              selected={selectedSize}
+              onSelect={(val) => setSelectedVariation(sizeVar.name, val)}
+              limit={3}
+            />
           </div>
         )}
 
-        {/* Stock hint */}
-        <div className="text-sm">
-          {available ? (
-            <span className="text-green-600">In stock</span>
-          ) : variations?.length ? (
-            <span className="text-red-600">Select a variant to check stock</span>
-          ) : (
-            <span className="text-green-600">In stock</span>
-          )}
-        </div>
+        {/* Validation hint (only after user tries and it's invalid) */}
+        {showValidationHint && !canAddToCart && missing.length > 0 && (
+          <div className="text-sm mt-2 text-red-600">
+            Please select {missing.join(" and ")} before adding to cart.
+          </div>
+        )}
+
+        {/* Stock hint – only after a successful Add To Cart click */}
+        {showStockHint && (
+          <div className="text-sm mt-2">
+            {available ? (
+              <span className="text-green-600">In stock</span>
+            ) : variations?.length ? (
+              <span className="text-red-600">Select a variant to check stock</span>
+            ) : (
+              <span className="text-green-600">In stock</span>
+            )}
+          </div>
+        )}
 
         {/* CTAs */}
-        <div className="flex w-full gap-3">
-  <button
-    onClick={onAddToCart}
-    className="
-      flex-1 w-full rounded-xl bg-black text-white
-      py-3 sm:py-3.5 md:py-4
-      text-sm sm:text-base md:text-lg
-      font-semibold transition hover:bg-gray-900
-    "
-  >
-    Add to cart
-  </button>
+        <div className="flex w-full gap-3 flex-col sm:flex-row mt-4">
+          <button
+            onClick={handleAddClick}
+            className={`flex-1 w-full rounded-xl text-white
+                        py-3 sm:py-3.5 md:py-4
+                        text-sm sm:text-base md:text-lg
+                        font-semibold transition
+                        bg-black hover:bg-gray-900"
+                            : "bg-gray-400 cursor-not-allowed `}
+          >
+            Add To Cart
+          </button>
 
-  <button
-    onClick={openCart}
-    className="
-      flex-1 w-full rounded-xl border border-black text-black
-      py-3 sm:py-3.5 md:py-4
-      text-sm sm:text-base md:text-lg
-      font-semibold transition hover:bg-black hover:text-white
-    "
-  >
-    Checkout
-  </button>
-</div>
+          <button
+            onClick={openCart}
+            className="flex-1 w-full rounded-xl border border-black text-black
+                       py-3 sm:py-3.5 md:py-4
+                       text-sm sm:text-base md:text-lg
+                       font-semibold transition hover:bg-black hover:text-white"
+          >
+            Checkout Now
+          </button>
+        </div>
       </div>
 
+      <button
+        type="button"
+        className="font-clash font-medium text-sm underline text-left mt-6 text-grayDes hover:text-gray-700 transition"
+        style={{
+          fontSize: "16px",
+          lineHeight: "120%",
+          letterSpacing: "0%",
+          textDecorationStyle: "solid",
+        }}
+      >
+        Delivery T&C
+      </button>
       <div />
     </div>
   );
-}  
+}

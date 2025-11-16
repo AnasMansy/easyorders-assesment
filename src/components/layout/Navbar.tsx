@@ -16,6 +16,8 @@ function Navbar() {
   const [isOpenSearch, setIsOpenSearch] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const items = useCartStore((state) => state.items);
+  const openCartDrawer = useCartDrawerStore((state) => state.open);
+
   useEffect(() => {
     if (isMobileMenuOpen) {
       document.body.style.overflow = "hidden";
@@ -26,14 +28,17 @@ function Navbar() {
 
   return (
     <header className="container  fixed top-0 left-0 mt-7 right-0 bg-white py-8 z-50 h-20">
-      <div className="fixed top-0 left-0 w-full bg-black text-white text-center py-2 flex items-center justify-center z-[9999]">
-      <span className="text-sm sm:text-base">
-        New season coming! Discount 10% for all product! Checkout Now!
-      </span>
-      <span className="ml-3 text-xs bg-gray-700 rounded-full px-2 py-0.5">
-        20:40
-      </span>
-    </div>
+      <div className="flex flex-col md:flex-row fixed top-0 left-0 w-full bg-black text-white text-center py-2 flex items-center justify-center z-[9999]">
+        <span className="text-sm sm:text-base ml-1">
+          New season coming! Discount 10%
+        </span>
+        <span className="text-sm sm:text-base">
+          for all product! Checkout Now!<span className="ml-3 text-xs bg-gray-700 rounded-full px-2 py-0.5">
+            20:40
+          </span>
+        </span>
+
+      </div>
 
       <div className="flex items-center justify-between gap-4 ">
         <div className="flex items-center flex-grow justify-between">
@@ -65,7 +70,7 @@ function Navbar() {
           </div>
           {/* Desktop Navigation */}
 
-          
+
           <nav className="hidden md:flex items-center gap-8 ml-8">
             <Link
               to="/"
@@ -87,13 +92,10 @@ function Navbar() {
               <img src={favoriteIcon} alt="Favorites" className="h-5 w-5" />
             </Link>
 
-            <Link
-              to="/"
+            <button
+              type="button"
               className="relative flex items-center"
-              onClick={(e) => {
-                e.preventDefault();
-                useCartDrawerStore.getState().open();
-              }}
+              onClick={openCartDrawer}
             >
               <img src={cartIcon} alt="Cart" className="h-5 w-5" />
               {items.length > 0 && (
@@ -101,19 +103,16 @@ function Navbar() {
                   {items.length}
                 </span>
               )}
-            </Link>
+            </button>
           </nav>
         </div>
 
         {/* Mobile Icons , hiiden in Desktop */}
         <div className="flex items-center gap-5 md:hidden">
-          <Link
-            to="/"
+          <button
+            type="button"
             className="relative flex items-center"
-            onClick={(e) => {
-              e.preventDefault();
-              useCartDrawerStore.getState().open();
-            }}
+            onClick={openCartDrawer}
           >
             <img src={cartIcon} alt="Cart" className="h-5 w-5" />
             {items.length > 0 && (
@@ -121,7 +120,7 @@ function Navbar() {
                 {items.length}
               </span>
             )}
-          </Link>
+          </button>
 
           <button
             onClick={() => setIsMobileMenuOpen(true)}

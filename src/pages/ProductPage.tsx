@@ -26,7 +26,7 @@ function ProductPage() {
       
       <main className="flex-grow mt-28">
         <div className="container">
-          <hr className="m-0 border-t-[0.5px] border-dashed border-[#A3A3A3]" />
+          <hr className="m-2 border-t-[.4px] border-dashed border-[#A3A3A3]" />
         </div>
         <Navigation items={crumbs} />
 
