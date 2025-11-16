@@ -150,11 +150,11 @@ export default function ProductInfo({
                 style={
                   !expanded
                     ? {
-                        display: "-webkit-box",
-                        WebkitLineClamp: 4,
-                        WebkitBoxOrient: "vertical",
-                        overflow: "hidden",
-                      }
+                      display: "-webkit-box",
+                      WebkitLineClamp: 4,
+                      WebkitBoxOrient: "vertical",
+                      overflow: "hidden",
+                    }
                     : undefined
                 }
               >
@@ -236,14 +236,14 @@ export default function ProductInfo({
           </div>
         )}
 
-        {/* Validation hint (only after user tries and it's invalid) */}
+        {/* Validation hint  */}
         {showValidationHint && !canAddToCart && missing.length > 0 && (
           <div className="text-sm mt-2 text-red-600">
             Please select {missing.join(" and ")} before adding to cart.
           </div>
         )}
 
-        {/* Stock hint – only after a successful Add To Cart click */}
+        {/* Stock hint  */}
         {showStockHint && (
           <div className="text-sm mt-2">
             {available ? (
@@ -259,26 +259,29 @@ export default function ProductInfo({
         {/* CTAs */}
         <div className="flex w-full gap-3 flex-col sm:flex-row mt-4">
           <button
-            onClick={handleAddClick}
-            className={`flex-1 w-full rounded-xl text-white
-                        py-3 sm:py-3.5 md:py-4
-                        text-sm sm:text-base md:text-lg
-                        font-semibold transition
-                        bg-black hover:bg-gray-900"
-                            : "bg-gray-400 cursor-not-allowed `}
-          >
-            Add To Cart
-          </button>
+  onClick={handleAddClick}
+  className={`flex-1 w-full rounded-xl text-white
+              py-3 sm:py-3.5 md:py-4
+              text-sm sm:text-base md:text-lg
+              font-semibold transition
+              bg-black hover:bg-gray-900"
+                  : "bg-gray-400 cursor-not-allowed `}
+>
+  Add To Cart
+</button>
 
-          <button
-            onClick={openCart}
-            className="flex-1 w-full rounded-xl border border-black text-black
-                       py-3 sm:py-3.5 md:py-4
-                       text-sm sm:text-base md:text-lg
-                       font-semibold transition hover:bg-black hover:text-white"
-          >
-            Checkout Now
-          </button>
+
+         <button
+  onClick={openCart}
+  className="flex-1 w-full rounded-xl border border-black text-black
+             py-3 sm:py-3.5 md:py-4
+             text-sm sm:text-base md:text-lg
+             font-semibold transition hover:bg-black hover:text-white"
+>
+  Checkout Now
+</button>
+
+
         </div>
       </div>
 
